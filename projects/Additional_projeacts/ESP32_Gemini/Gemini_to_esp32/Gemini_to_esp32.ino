@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -6,21 +5,26 @@
 
 const char* ssid = "Are-you-watching";
 const char* password = "Praveen@2004";
-const char* Gemini_Token = "API Key";
+const char* Gemini_Token = "AIzaSyCVFInYR7Tp93fOPE_ZYUb-_C1aHXL1Pnk";
 const char* Gemini_Max_Tokens = "100";
 String res = "";
 
+// Define LED pins for ESP32 38-pin
+const int yellowLED = 18;
+const int greenLED = 19;
 
 void setup() {
   Serial.begin(115200);
 
+  // Setup LEDs as outputs
+  pinMode(yellowLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-
   while (!Serial)
     ;
-
 
   // wait for WiFi connection
   WiFi.begin(ssid, password);
@@ -35,10 +39,9 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-void loop() 
-{
+void loop() {
   Serial.println("");
-  Serial.println("Ask your Question : ");
+  Serial.println("Ask your Question: ");
   while (!Serial.available())
     ;
   while (Serial.available()) {
@@ -50,38 +53,27 @@ void loop()
   res = res.substring(0, (len - 1));
   res = "\"" + res + "\"";
   Serial.println("");
-  Serial.print("Asking Your Question : ");
+  Serial.print("Asking Your Question: ");
   Serial.println(res);
 
   HTTPClient https;
 
-  //Serial.print("[HTTPS] begin...\n");
-  if (https.begin("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + (String)Gemini_Token)) {  // HTTPS
+  // Turn on yellow LED during processing
+  digitalWrite(yellowLED, HIGH);
 
+  if (https.begin("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + (String)Gemini_Token)) {
     https.addHeader("Content-Type", "application/json");
     String payload = String("{\"contents\": [{\"parts\":[{\"text\":" + res + "}]}],\"generationConfig\": {\"maxOutputTokens\": " + (String)Gemini_Max_Tokens + "}}");
 
-    //Serial.print("[HTTPS] GET...\n");
-
-    // start connection and send HTTP header
     int httpCode = https.POST(payload);
-
-    // httpCode will be negative on error
-    // file found at server
 
     if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
       String payload = https.getString();
-      //Serial.println(payload);
-
       DynamicJsonDocument doc(1024);
-
-
       deserializeJson(doc, payload);
       String Answer = doc["candidates"][0]["content"]["parts"][0]["text"];
 
-
-      
-      // For Filtering our Special Characters, WhiteSpaces and NewLine Characters
+      // Filter special characters, whitespace, and newlines
       Answer.trim();
       String filteredAnswer = "";
       for (size_t i = 0; i < Answer.length(); i++) {
@@ -94,17 +86,31 @@ void loop()
       }
       Answer = filteredAnswer;
 
-
       Serial.println("");
       Serial.println("Here is your Answer: ");
       Serial.println("");
       Serial.println(Answer);
+
+      // Turn off yellow LED and turn on green LED once the answer is received
+      digitalWrite(yellowLED, LOW);
+      digitalWrite(greenLED, HIGH);
+
     } else {
       Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+
+      // In case of error, turn off yellow LED
+      digitalWrite(yellowLED, LOW);
     }
     https.end();
   } else {
     Serial.printf("[HTTPS] Unable to connect\n");
+
+    // If connection fails, turn off yellow LED
+    digitalWrite(yellowLED, LOW);
   }
   res = "";
+
+  // Turn off green LED after a short delay
+  delay(3000);  // Keep green LED on for 3 seconds
+  digitalWrite(greenLED, LOW);
 }
