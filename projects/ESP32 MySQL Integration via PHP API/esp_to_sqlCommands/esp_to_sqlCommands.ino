@@ -5,7 +5,7 @@
 const char* ssid = "pkr";
 const char* password = "praveen@123";
 
-const char* serverName = "http://192.168.137.1/esp32_api/sql_api.php"; // Update with your server's IP and path
+const char* serverName = "http://192.168.161.48/esp32_api/sql_api.php"; // Update with your server's IP and path
 
 void setup() {
   Serial.begin(115200);
