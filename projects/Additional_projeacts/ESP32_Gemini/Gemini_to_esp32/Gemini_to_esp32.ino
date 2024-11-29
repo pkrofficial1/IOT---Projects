@@ -61,7 +61,7 @@ void loop() {
   // Turn on yellow LED during processing
   digitalWrite(yellowLED, HIGH);
 
-  if (https.begin("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + (String)Gemini_Token)) {
+  if (https.begin("  " + (String)Gemini_Token)) {
     https.addHeader("Content-Type", "application/json");
     String payload = String("{\"contents\": [{\"parts\":[{\"text\":" + res + "}]}],\"generationConfig\": {\"maxOutputTokens\": " + (String)Gemini_Max_Tokens + "}}");
 
