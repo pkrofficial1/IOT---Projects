@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 
 const char* ssid = "Are-you-watching";
-const char* password = "Praveen@2004";
+const char* password = "Give your password";
 const char* Gemini_Token = "API Key";
 const char* Gemini_Max_Tokens = "100";
 String res = "";
@@ -56,7 +56,7 @@ void loop()
   HTTPClient https;
 
   //Serial.print("[HTTPS] begin...\n");
-  if (https.begin("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + (String)Gemini_Token)) {  // HTTPS
+  if (https.begin("api key" + (String)Gemini_Token)) {  // HTTPS
 
     https.addHeader("Content-Type", "application/json");
     String payload = String("{\"contents\": [{\"parts\":[{\"text\":" + res + "}]}],\"generationConfig\": {\"maxOutputTokens\": " + (String)Gemini_Max_Tokens + "}}");
