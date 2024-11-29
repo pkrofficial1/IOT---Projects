@@ -4,8 +4,8 @@
 #include <ArduinoJson.h>
 
 const char* ssid = "Are-you-watching";
-const char* password = "Praveen@2004";
-const char* Gemini_Token = "AIzaSyCVFInYR7Tp93fOPE_ZYUb-_C1aHXL1Pnk";
+const char* password = "";
+const char* Gemini_Token = "";
 const char* Gemini_Max_Tokens = "100";
 String res = "";
 
